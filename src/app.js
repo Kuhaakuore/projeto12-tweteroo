@@ -24,4 +24,18 @@ app.post("/tweet", (req, res) => {
     res.send("OK");
 });
 
+app.get("/tweets", (req, res) => {
+    const userTweets = [];
+    for (let i = tweets.length - 1; i >= 0; i--) {
+        if (userTweets.length === 10) break;
+        const userTweet = {
+            username: tweets[i].username,
+            avatar: users.find(user => user.username === tweets[i].username).avatar,
+            tweet: tweets[i].tweet
+        }
+        userTweets.push(userTweet);
+    }
+    res.send(userTweets);
+});
+
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
