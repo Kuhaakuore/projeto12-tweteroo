@@ -18,7 +18,7 @@ app.post("/sign-up", (req, res) => {
   if (!user.username.trim() || !user.avatar.trim())
     return res.status(400).send("Todos os campos são obrigatórios!");
   users.push(user);
-  res.send("OK");
+  res.status(201).send("OK");
 });
 
 app.post("/tweets", (req, res) => {
@@ -29,9 +29,9 @@ app.post("/tweets", (req, res) => {
   if (!tweet.username.trim() || !tweet.tweet.trim())
     return res.status(400).send("Todos os campos são obrigatórios!");
   if (!users.find((user) => user.username === tweet.username))
-    return res.send("UNAUTHORIZED");
+    return res.status(401).send("UNAUTHORIZED");
   tweets.push(tweet);
-  res.send("OK");
+  res.status(201).send("OK");
 });
 
 app.get("/tweets", (req, res) => {
