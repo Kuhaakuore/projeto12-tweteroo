@@ -1,4 +1,4 @@
-import express from "express";
+import express, { text } from "express";
 import cors from "cors";
 
 // Config variables
@@ -22,8 +22,11 @@ app.post("/sign-up", (req, res) => {
 });
 
 app.post("/tweets", (req, res) => {
-  const tweet = req.body;
-  console.log(typeof tweet.username);
+  const { user } = req.headers;
+  const tweet = {
+    username: user,
+    tweet: req.body.tweet,
+  }
   if (typeof tweet.username !== "string" || typeof tweet.tweet !== "string")
     return res.status(400).send("Todos os campos são obrigatórios!");
   if (!tweet.username.trim() || !tweet.tweet.trim())
@@ -35,7 +38,23 @@ app.post("/tweets", (req, res) => {
 });
 
 app.get("/tweets", (req, res) => {
+  const page = parseInt(req.query.page);
   const userTweets = [];
+  if (page || page === 0) {
+    if (page < 1) return res.status(400).send("Informe uma página válida!");
+    const initialIndex = tweets.length - 1 - (page - 1) * 10;
+    for (let i = initialIndex; i >= 0; i--) {
+      if (userTweets.length === 10) break;
+      const userTweet = {
+        username: tweets[i].username,
+        avatar: users.find((user) => user.username === tweets[i].username)
+          .avatar,
+        tweet: tweets[i].tweet,
+      };
+      userTweets.push(userTweet);
+    }
+    return res.send(userTweets);
+  }
   for (let i = tweets.length - 1; i >= 0; i--) {
     if (userTweets.length === 10) break;
     const userTweet = {
@@ -44,6 +63,23 @@ app.get("/tweets", (req, res) => {
       tweet: tweets[i].tweet,
     };
     userTweets.push(userTweet);
+  }
+  res.send(userTweets);
+});
+
+app.get("/tweets/:USERNAME", (req, res) => {
+  const username = req.params.USERNAME;
+  const userTweets = [];
+  for (let i = tweets.length - 1; i >= 0; i--) {
+    if (tweets[i].username === username) {
+      const userTweet = {
+        username: tweets[i].username,
+        avatar: users.find((user) => user.username === tweets[i].username)
+          .avatar,
+        tweet: tweets[i].tweet,
+      };
+      userTweets.push(userTweet);
+    }
   }
   res.send(userTweets);
 });
