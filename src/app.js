@@ -1,11 +1,12 @@
-import express, { text } from "express";
 import cors from "cors";
+import express from "express";
 
 // Config variables
 const app = express();
 app.use(cors());
 app.use(express.json());
 const PORT = 5000;
+const MESSAGE = "Todos os campos são obrigatórios!";
 
 // Data variables
 const users = [];
@@ -14,11 +15,11 @@ const tweets = [];
 app.post("/sign-up", (req, res) => {
   const user = req.body;
   if (typeof user.username !== "string" || typeof user.avatar !== "string")
-    return res.status(400).send("Todos os campos são obrigatórios!");
+    return res.status(400).send(MESSAGE);
   if (!user.username.trim() || !user.avatar.trim())
-    return res.status(400).send("Todos os campos são obrigatórios!");
+    return res.status(400).send(MESSAGE);
   users.push(user);
-  res.status(201).send("OK");
+  return res.status(201).send("OK");
 });
 
 app.post("/tweets", (req, res) => {
@@ -26,15 +27,15 @@ app.post("/tweets", (req, res) => {
   const tweet = {
     username: user,
     tweet: req.body.tweet,
-  }
+  };
   if (typeof tweet.username !== "string" || typeof tweet.tweet !== "string")
-    return res.status(400).send("Todos os campos são obrigatórios!");
+    return res.status(400).send(MESSAGE);
   if (!tweet.username.trim() || !tweet.tweet.trim())
-    return res.status(400).send("Todos os campos são obrigatórios!");
+    return res.status(400).send(MESSAGE);
   if (!users.find((user) => user.username === tweet.username))
     return res.status(401).send("UNAUTHORIZED");
   tweets.push(tweet);
-  res.status(201).send("OK");
+  return res.status(201).send("OK");
 });
 
 app.get("/tweets", (req, res) => {
@@ -64,7 +65,7 @@ app.get("/tweets", (req, res) => {
     };
     userTweets.push(userTweet);
   }
-  res.send(userTweets);
+  return res.send(userTweets);
 });
 
 app.get("/tweets/:USERNAME", (req, res) => {
@@ -81,7 +82,7 @@ app.get("/tweets/:USERNAME", (req, res) => {
       userTweets.push(userTweet);
     }
   }
-  res.send(userTweets);
+  return res.send(userTweets);
 });
 
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
